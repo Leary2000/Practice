@@ -1,7 +1,7 @@
 import java.util.Scanner;
 import java.lang.Math;
 //finds which num in an array is closest to the average of the array
-public class Main
+public class Average
 {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
