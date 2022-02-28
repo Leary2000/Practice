@@ -2,12 +2,13 @@ import java.util.Scanner;
 public class CollatzSort {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int[] arr = new int[5];
-        int[] count = new int[5];
-        for (int i = 0; i < 5; i++) {
+        int l = sc.nextInt();
+        int[] arr = new int[l];
+        int[] count = new int[l];
+        for (int i = 0; i < l; i++) {
             arr[i] = sc.nextInt();
         }
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < l; i++) {
 
             int n = arr[i];
             while (n > 1) {
@@ -15,11 +16,12 @@ public class CollatzSort {
                 count[i]++;
             }
         }
-        sort(arr, count);
-        for (int i = 0; i < 5; i++)
-        {
-            System.out.println(arr[i] + " " + count[i]);
-        }
+        //create new quicksort object
+        Quicksort ob = new Quicksort();
+        ob.sort(0, l - 1, count);
+        for (int i = 0; i < l; i++)
+            System.out.println(count[i]);
+
 
     }
 
@@ -34,43 +36,38 @@ public class CollatzSort {
         }
         return n;
     }
-    //sorting method
-    public static void sort(int[] arr, int[] count) {
-        for (int i = 0; i < count.length; i++) {
-            for (int j = i + 1; j < count.length; j++) {
-                int tmp = 0;
-                int tmp2 = 0;
-                if (count[i] > count[j]) {
-                    tmp = arr[i];
-                    tmp2 = count[i];
-                    arr[i] = arr[j];
-                    count[i] = count[j];
-                    count[j] = tmp2;
-                    arr[j] = tmp;
-                }
-                //if count is same size, will sort by smaller initial number
-                else if((count[i] == count[j]))
+}
+    //Quicksort is a separate class
+    class Quicksort
+    {
+    int partition(int left, int right,int[] arr)
+    {
+            int p = arr[right];
+            int i = (left - 1);
+            for(int j = left;j < right;j++)
+            {
+                if(arr[j] <= p)
                 {
-                    if(arr[i] < arr[j])
-                    {
-                        tmp = arr[i];
-                        tmp2 = count[i];
-                        arr[i] = arr[j];
-                        count[i] = count[j];
-                        count[j] = tmp2;
-                        arr[j] = tmp;
-                    }
-                    else
-                    {
-                        tmp = arr[i];
-                        tmp2 = count[i];
-                        arr[i] = arr[j];
-                        count[i] = count[j];
-                        count[j] = tmp2;
-                        arr[j] = tmp;
-                    }
+                    i++;
+                    int temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
                 }
             }
-        }
+        int temp = arr[i+1];
+        arr[i+1] = arr[right];
+        arr[right] = temp;
+
+        return i+1;
     }
+    void sort(int left, int right, int[] arr)
+    {
+            if (left < right)
+            {
+                int p = partition(left, right,arr);
+
+                sort(left, p-1,arr);
+                sort( p+1, right,arr);
+            }
+        }
 }
