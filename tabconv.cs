@@ -1,8 +1,12 @@
+/*
+References:
+https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-tuples
+https://learn.microsoft.com/en-us/dotnet/api/system.io.streamreader?view=net-7.0 
+https://learn.microsoft.com/en-us/dotnet/api/system.io.streamwriter?view=net-7.0
+*/
+
 using System;
 using System.IO;
-using HtmlAgilityPack;
-using System.Text;
-using System.Linq;
 
 public class table
 {
@@ -32,7 +36,7 @@ public class table
     }
         public void printTable()
         {
-            Console.WriteLine(numCols);
+           //Console.WriteLine(numCols);
             for(int i = 0; i < numRows; i++)
         {
             for(int j = 0; j< numCols; j++)
@@ -44,9 +48,6 @@ public class table
         }
         }
 }
-
-
-
  class tabconv
     {
         public static void Main(String[] args)
@@ -99,7 +100,10 @@ public class table
                 var tuple = (0,0,empty);
 
             if(verbose == true)
+            {
+            Console.WriteLine();
             Console.WriteLine("Extracting data from " + extension + " file");
+            }
             
             //creating table oject from our different methods
             switch (extension) 
@@ -125,7 +129,7 @@ public class table
             //using the tuple we make our table object
             table myTable = new table(tuple.Item1,tuple.Item2,tuple.Item3);
 
-            //myTable.printTable();
+           // myTable.printTable();
             
 
             if(verbose == true)
@@ -149,7 +153,11 @@ public class table
             }
 
             if(verbose == true)
+            {
             Console.WriteLine("Completed");
+            Console.WriteLine();
+
+            }
             }
             
             }
@@ -158,11 +166,6 @@ public class table
             {
                 Console.WriteLine("Please check your input and try again");
             }
-            
-        
-            
-       
-
         }
 
             static void list()
@@ -176,6 +179,13 @@ public class table
 
             static void help()
             {
+                Console.WriteLine("Welcome to Tabconv table converter.");
+                Console.WriteLine("Commands are as follows:");
+                Console.WriteLine("-h : help");
+                Console.WriteLine("-l : list");
+                Console.WriteLine("-i : info");
+                Console.WriteLine("-v : verbose mode");
+                Console.WriteLine("<file.ext> -o <file.ext> : convert table");
             }
 
 
@@ -508,166 +518,23 @@ public class table
                     continue;
                     
                     String[] line = l.Split("|");
-
                     for(int i = 1 ; i < line.Length; i++)
                     {
-                    Data[rows,i] = line[i];
-                    
+                    //ignoring the first element in line[] as it is empty
+                    Data[rows,i - 1] = line[i];
                     }
 
-                    if(rows == 0)
                     cols = line.Length - 1;
-
-                     
                     rows++;
                     
                     }
 
             }
 
+            //decrease cols by 1 to ignore empty column
+            cols--;
             return new Tuple <int,int,string[,] > (rows,cols,Data);
 
 
    }
  }
-ng System;
-using System.IO;
-using HtmlAgilityPack;
-using System.Text;
-using System.Linq;
-
-public class table
-{
-    public int numRows { get; }
-    public int numCols { get; }
-    public string[,] myTable;
-
-    
-
-    public table(int numRows, int numCols,string[,] data)
-    {
-        this.numRows = numRows;
-        this.numCols = numCols;
-        myTable = new string[numRows,numCols];
-
-        
-
-        for(int i = 0; i < numRows; i++)
-        {
-            for(int j = 0; j< numCols; j++)
-            {
-
-            myTable[i,j] = data[i,j];
-           // Console.WriteLine(myTable[i,j]);
-            }
-        }
-    }
-        public void printTable()
-        {
-            for(int i = 0; i < numRows; i++)
-        {
-            for(int j = 0; j< numCols; j++)
-            {
-                Console.Write(myTable[i,j] + " ");
-            }
-                            Console.WriteLine();
-
-        }
-        }
-
-
-
-
-
- class tabconv
-    {
-        static void Main()
-        {
-            //path to temp folder
-        string path = @"/home/raikchu9/264/tabconv/temp/test.csv";
-        string json = @"/home/raikchu9/264/tabconv/temp/test.json";
-        string html = @"/home/raikchu9/264/tabconv/temp/test.html";
-        string md = @"/home/raikchu9/264/tabconv/temp/test.md";
-
-
-        if (File.Exists(json))
-        {
-           File.Delete(json);
-        }
-         if (File.Exists(html))
-        {
-           File.Delete(html);
-        }
-        if (File.Exists(md))
-        {
-           File.Delete(md);
-        }
-           MakeCSVTable(path);
-        }
-
-
-
-        public static void MakeCSVTable(string path)
-        {
-            String[,] Data = new String[200, 200];
-            String[] headers;
-            int cols = 0;
-            int count = 0;
-
-            using (StreamReader sr = new StreamReader(path))
-            {
-                //l gets line and is used to check when it has reached end of file
-                 String l;
-
-                //get first line for repeated use
-                while((l = sr.ReadLine()) != null)
-                {
-                    //l is split into an array of each word
-                    String[] line = l.Split(',');
-                    cols = line.Length;
-                    for(int i = 0; i < line.Length; i++)
-                    {
-                    Data[count, i] = line[i];
-                    }
-
-                count++;
-                }
-
-            }
-
-            table CSVTable = new table(count,cols,Data);
-            CSVTable.printTable();
-
-        }
-
-
-         public static void MakeJSONTable(string path)
-        {
-            String[,] Data = new String[200, 200];
-            String[] headers;
-            int cols = 0;
-            int count = 0;
-
-            using (StreamReader sr = new StreamReader(path))
-            {
-                //l gets line and is used to check when it has reached end of file
-                 String l;
-
-                while((l = sr.ReadLine()) != null)
-                {
-
-                    
-                }
-
-            }
-
-            table JSONTable = new table(count,cols,Data);
-            JSONTable.printTable();
-
-        }
-    }
-
-
-
-}
-
