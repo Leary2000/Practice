@@ -153,10 +153,7 @@ using System;
 
              using (StreamWriter fs = File.CreateText(path))    
                 {  
-
-                for(int i = 0; i < canvas.Count;i++)
-                fs.WriteLine(canvas[i]);
-                 
+                   canvas.ForEach(fs.WriteLine);
                 }
         }
 
