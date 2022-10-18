@@ -1,12 +1,9 @@
 using System;
     class SVGModels
-    {using System;
-    class SVGModels
     {
         static void Main ()
         {
             bool exit = false;
-            int Zindex = 0;
             //string canvas;
             List<object> canvas = new List<object>();
             canvas.Add("<svg>");
@@ -22,8 +19,12 @@ using System;
             Console.WriteLine("4) Create Line");
             Console.WriteLine("5) Create PolyLine");
             Console.WriteLine("6) Create Polygon");
-            Console.WriteLine("7) Exit");
+            Console.WriteLine("7) Update Element");
             Console.WriteLine("8) Swap Elements");
+            Console.WriteLine("9) Delete Element");
+            Console.WriteLine("10) Exit");
+
+
 
 
 
@@ -112,22 +113,40 @@ using System;
                 
 
                 case 7:
-                exit = true;
-                canvas.Add("</svg>");
+                Console.WriteLine("Choose element to update.");
+                for(int i = 1; i < canvas.Count; i ++)
+                Console.WriteLine(i + " - " + canvas[i]);
 
-                Console.WriteLine("Exited");
+                int update = int.Parse(Console.ReadLine());
+                updateElement(canvas,update);
                 break;
 
                 case 8:
                 for(int i = 1; i < canvas.Count; i ++)
                 Console.WriteLine(i + " - " + canvas[i]);
-
                 int a = int.Parse(Console.ReadLine());
                 int b = int.Parse(Console.ReadLine());
                 swapElement(canvas,a,b);
                 Console.WriteLine();
+                break;
 
+                case 9:
+                Console.WriteLine("Select element to Delete:");
+                for(int i = 1; i < canvas.Count; i ++)
+                Console.WriteLine(i + " - " + canvas[i]);
 
+                int delete = int.Parse(Console.ReadLine());
+                if(delete != 0 | delete != canvas.Count)
+                DeleteElement(canvas,delete);
+                else
+                Console.WriteLine("error, please try again");
+
+                break;
+
+                case 10:
+                 exit = true;
+                canvas.Add("</svg>");
+                Console.WriteLine("Exited");
                 break;
             }
             }
@@ -141,6 +160,36 @@ using System;
             object temp = list[a];
             list[a] = list[b];
             list[b] = temp;
+            
+
+        }
+
+        public static void updateElement(List<object> list,int a)
+        {
+            string[] l = list[a].ToString().Split("stroke");
+
+            Console.WriteLine();
+            Console.Write("New stroke: ");
+            string stroke = Console.ReadLine();
+
+            Console.WriteLine();
+            Console.Write("New fill: ");
+            string fill = Console.ReadLine();
+
+           list[a] = l[0] + " stroke=\"" + stroke + "\" " + "stroke-width = \"4\"" + " fill= \"" + fill + "\"" + "/>" ;
+
+        }
+
+        public static void DeleteElement(List<object> list,int a)
+        {
+            for(int i = a; i < list.Count; i++)
+            {
+                if((i+1) != list.Count)
+                list[i] = list[i+1];
+
+                else
+                list.RemoveAt(i);
+            }
 
         }
 
@@ -153,28 +202,33 @@ using System;
 
              using (StreamWriter fs = File.CreateText(path))    
                 {  
-                   canvas.ForEach(fs.WriteLine);
+
+                canvas.ForEach(fs.WriteLine);
                 }
         }
 
      
          class Circle
         {
-            private int x{get; set;}
-            private int y{get; set;}
-            private int radius{get; set;}
+             public int x{get; set;}
+             public int y{get; set;}
+             public int radius{get; set;}
 
+             public string stroke  {get; set;}
+             public string fill{get; set;}
                 public Circle(int x, int y, int r)
                 {
                     this.x = x;
                     this.y = y;
                     this.radius = r;
+                    this.stroke = "yellow";
+                    this.fill = "yellow";
                 }
 
                 public string printShape()
                 {
 
-                    string svg = "<circle cx =" + "\"" + this.x + "\"" + " cy=" + "\"" + this.y + "\"" + " r=" + "\"" + this.radius + "\"" +" stroke=\"yellow\"" + " stroke-width=\"4\"" +  " fill=\"yellow\"" + "/>";
+                    string svg = "<circle cx =" + "\"" + this.x + "\"" + " cy=" + "\"" + this.y + "\"" + " r=" + "\"" + this.radius + "\"" +" stroke=\"" + this.stroke + "\"" + " stroke-width=\"4\"" +  " fill=\"" + this.stroke + "\"" + "/>";
 
                     return svg;
                 }
@@ -297,156 +351,5 @@ using System;
                     string svg = "<polygon points=\"" + this.x + "," + this.points + "," + this.y +"\" stroke=\"red\"" + " stroke-width=\"1\"" +  " fill=\"pink\""+" />";
                     return svg;
                 }
-        }
-    }
-        static void Main ()
-        {
-            bool exit = false;
-            int Zindex = 0;
-            //string canvas;
-            List<object> canvas = new List<object>();
-            //start of canvas
-            Console.Clear();
-
-            while(exit == false)
-            {
-            Console.WriteLine("Choose shape to create below");
-            Console.WriteLine("1) Create Circle");
-            Console.WriteLine("2) Create Square");
-            Console.WriteLine("3) Create Ellipse");
-            Console.WriteLine("4) Create Line");
-            Console.WriteLine("5) Create PolyLine");
-            Console.WriteLine("6) Create Polygon");
-            Console.WriteLine("7) Exit");
-
-            int choice = int.Parse(Console.ReadLine());
-
-            switch(choice)
-            {
-                case 1:
-                int CircleZ = Zindex;
-                Zindex++;
-                int x = int.Parse(Console.ReadLine());
-                int y = int.Parse(Console.ReadLine());
-                int r = int.Parse(Console.ReadLine());
-                Circle myCircle = new Circle(x,y,r,CircleZ);
-                canvas.Add(myCircle.printShape());
-                break;
-
-
-                case 2:
-                int SquareZ = Zindex;
-                Zindex++;
-                int squareX = int.Parse(Console.ReadLine());
-                int squareY = int.Parse(Console.ReadLine());
-                int squareWidth = int.Parse(Console.ReadLine());
-                int squareHeigth = int.Parse(Console.ReadLine());
-                Square mySquare = new Square(squareX,squareY,squareWidth,squareHeigth,SquareZ);
-                canvas.Add(mySquare.printShape());
-                break;
-
-                case 3:
-                int EllipseZ = Zindex;
-                Zindex++;
-                int ellipseX = int.Parse(Console.ReadLine());
-                int ellipseY = int.Parse(Console.ReadLine());
-                int ellipseRX = int.Parse(Console.ReadLine());
-                int ellipseRY = int.Parse(Console.ReadLine());
-                Square myEllipse = new Square(ellipseX,ellipseY,ellipseRX,ellipseRY,EllipseZ);
-                canvas.Add(myEllipse);
-                break;
-
-                case 7:
-                exit = true;
-                Console.WriteLine("Exited");
-                break;
-
-            }
-            }
-            //end
-            canvas.ForEach(Console.WriteLine);
-        }
-
-        public void swapElement(List<string> list,int a,int b)
-        {
-            string temp = list[a];
-            list[a] = list[b];
-            list[b] = temp;
-
-        }
-        public class Circle
-        {
-            private int x{get; set;}
-            private int y{get; set;}
-            private int radius{get; set;}
-            private int Zindex{get; set;}
-
-                public Circle(int x, int y, int r, int z)
-                {
-                    this.x = x;
-                    this.y = y;
-                    this.radius = r;
-                    this.Zindex = z;
-                }
-
-                public string printShape()
-                {
-                    string svg = "<circle cx =" + this.x + " cy=" + this.y + " r=" + this.radius + "/>";
-                    return svg;
-                }
-
-        }
-
-        public class Square
-        {
-            private int x{get; set;}
-            private int y{get; set;}
-
-            private int height{get; set;}
-            private int width{get; set;}
-            private int Zindex{get; set;}
-
-
-                public Square(int x, int y, int h,int w,int z)
-                {
-                    this.x = x;
-                    this.y = y;
-                    this.height = h;
-                    this.width = w;
-                    this.Zindex = z;
-                }
-
-                public string printShape()
-                {
-                    string svg = "<circle cx =" + this.x + " cy=" + this.y + " width=" + this.width + " height=" + this.height +">";
-                    return svg;
-                }
-
-        }
-
-        public class Ellipse
-        {
-            private int x {get; set;}
-            private int y {get; set;}
-            private int rx {get; set;}
-            private int ry {get; set;}
-            private int Zindex{get; set;}
-
-            public Ellipse(int x, int y ,int rx ,int ry, int Zindex)
-            {
-                this.x = x;
-                this.y = y;
-                this.rx = rx;
-                this.ry = ry;
-                this.Zindex = Zindex;
-            }
-
-            public string printShape()
-                {
-                    string svg = "<ellipse cx =" + this.x + " cy=" + this.y + " rx=" + this.rx + " ry=" + this.ry +">";
-                    return svg;
-                }
-
-            
         }
     }
