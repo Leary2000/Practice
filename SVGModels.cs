@@ -6,25 +6,27 @@ using System;
             bool exit = false;
             //string canvas;
             List<object> canvas = new List<object>();
-            canvas.Add("<svg>");
+            canvas.Add("<svg viewBox= \"0 0 300 100\" xmlns= \"http://www.w3.org/2000/svg\" >");
+
+            // viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg"
             //start of canvas
             Console.Clear();
 
             while(exit == false)
             {
-            Console.WriteLine("Choose shape to create below");
+
             Console.WriteLine("1) Create Circle");
             Console.WriteLine("2) Create Square");
             Console.WriteLine("3) Create Ellipse");
             Console.WriteLine("4) Create Line");
             Console.WriteLine("5) Create PolyLine");
             Console.WriteLine("6) Create Polygon");
-            Console.WriteLine("7) Update Element");
-            Console.WriteLine("8) Swap Elements");
-            Console.WriteLine("9) Delete Element");
-            Console.WriteLine("10) Exit");
-
-
+            Console.WriteLine("7) Create Path");
+            Console.WriteLine("8) Update Style");
+            Console.WriteLine("9) Update SVG");
+            Console.WriteLine("10) Swap Elements");
+            Console.WriteLine("11) Delete Element");
+            Console.WriteLine("12) Exit");
 
 
 
@@ -110,18 +112,33 @@ using System;
                 createFile(canvas);
                 break;
 
+                case 7:
+                
+                string PathPoints = (Console.ReadLine());
+                Path myPath = new Path(PathPoints);
+                canvas.Add(myPath.printShape());
+                createFile(canvas);
+                break;
                 
 
-                case 7:
+                case 8:
                 Console.WriteLine("Choose element to update.");
                 for(int i = 1; i < canvas.Count; i ++)
                 Console.WriteLine(i + " - " + canvas[i]);
 
-                int update = int.Parse(Console.ReadLine());
-                updateElement(canvas,update);
+                int update2 = int.Parse(Console.ReadLine());
+                updateStyle(canvas,update2);
                 break;
 
-                case 8:
+                case 9:
+                Console.WriteLine("Choose element to update.");
+                for(int i = 1; i < canvas.Count; i ++)
+                Console.WriteLine(i + " - " + canvas[i]);
+                int update = int.Parse(Console.ReadLine());
+                updateSVG(canvas,update);
+                break;
+
+                case 10:
                 for(int i = 1; i < canvas.Count; i ++)
                 Console.WriteLine(i + " - " + canvas[i]);
                 int a = int.Parse(Console.ReadLine());
@@ -130,7 +147,7 @@ using System;
                 Console.WriteLine();
                 break;
 
-                case 9:
+                case 11:
                 Console.WriteLine("Select element to Delete:");
                 for(int i = 1; i < canvas.Count; i ++)
                 Console.WriteLine(i + " - " + canvas[i]);
@@ -143,7 +160,7 @@ using System;
 
                 break;
 
-                case 10:
+                case 12:
                  exit = true;
                 canvas.Add("</svg>");
                 Console.WriteLine("Exited");
@@ -164,7 +181,30 @@ using System;
 
         }
 
-        public static void updateElement(List<object> list,int a)
+public static void updateSVG(List<object> list,int a)
+        {
+            String[] l = list[a].ToString().Split("\"");
+            for(int i = 0; i < l.Length - 4; i++)
+            {
+                Console.WriteLine(l[i]);
+            }
+          
+            /*switch(l)
+            {
+                Case (l.Contains("circle")):
+                Console.WriteLine("circ");
+                break;
+
+                Case (l.Contains("square")):
+                Console.WriteLine("sqr");
+                break;
+            }*/
+
+            
+
+        }
+
+        public static void updateStyle(List<object> list,int a)
         {
             string[] l = list[a].ToString().Split("stroke");
 
@@ -175,6 +215,8 @@ using System;
             Console.WriteLine();
             Console.Write("New fill: ");
             string fill = Console.ReadLine();
+
+            //append new stroke and fill onto end of first part of the svg string
 
            list[a] = l[0] + " stroke=\"" + stroke + "\" " + "stroke-width = \"4\"" + " fill= \"" + fill + "\"" + "/>" ;
 
@@ -352,4 +394,23 @@ using System;
                     return svg;
                 }
         }
+
+        class Path
+        {
+            private string points {get; set;}
+
+
+            public Path(string points)
+            {
+                this.points = points;
+            }
+
+             public string printShape()
+                {
+                    string svg = "<path d=\"" + this.points +"\" stroke=\"red\"" + " stroke-width=\"1\"" +  " fill=\"pink\""+" />";
+                    return svg;
+                }
+        }
     }
+        
+   
