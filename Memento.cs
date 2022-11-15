@@ -1,5 +1,7 @@
-﻿using System;
-    class app
+
+
+using System;
+    class App
     {
         static void Main ()
         {            
@@ -8,7 +10,7 @@
 
             List<object> canvas = new List<object>();
             Originator originator = new Originator();
-            Caretaker caretaker = new Caretaker(originator);
+            Caretaker caretaker = new Caretaker();
 
             canvas.Add("<svg viewBox= \"0 0 300 100\" xmlns= \"http://www.w3.org/2000/svg\" >");
             Console.WriteLine("Canvas created - use commands to add shapes to the canvas	");
@@ -29,13 +31,11 @@
             Console.WriteLine("       -C    Clear canvas");
             Console.WriteLine("       -Q    Quit ");
             break;
-            /*possible shapes:*/
+
             case "A":
             addShape(choice[1],canvas);
-            caretaker.Backup();
-            
-
-            
+            originator.SetCanvas(canvas);
+            caretaker.add(originator.CreateMemento());
             break;
 
             case "U":
@@ -44,7 +44,6 @@
 
             case "R":
             caretaker.redo();
-            canvas=caretaker.getMomento();
             break;
 
             case "C":
@@ -54,8 +53,7 @@
 
             case "Q":
             Console.WriteLine("Goodbye!");
-            List<object> canvas2 = new List<object>();
-            canvas2 = caretaker.getMomento();
+            List<object> canvas2 = caretaker.getMemento().getCanvas();
             canvas2.Add("</svg>");
             canvas2.ForEach(Console.WriteLine);
 
@@ -64,10 +62,11 @@
 
             }
            
-            }
+        }
+
             //end
            // createFile(canvas);
-        }
+    }
 
    
         static void addShape(string shape,List<object> canvas)
@@ -299,44 +298,55 @@
 
 
         
-       public  class Memento
+        public  class Memento
         {
-              private List<object> canvas = new List<object>();
+            private List<object> canvas = new List<object>();
 
-              public Memento(List<object> canvas)
-              {
+            public Memento(List<object> canvas)
+            {
                 this.canvas = canvas;
-              }
+            }
 
-              public List<object> getCanvas()
-              {
+            public List<object> getCanvas()
+            {
                 return canvas;
-              }
+            }
 
         }
 
+        
 
-    public class Originator
-    {
-     public List<object> canvas = new List<object>();
 
-     public Memento CreateMemento()
-     {
-        return new Memento(canvas);
-     }
-
-      public void SetMemento(Memento memento)
+        public class Originator
         {
-            canvas = memento.getCanvas();
+            public List<object> canvas;
+
+            public void SetCanvas(List<object> canvas)
+            {
+                this.canvas = canvas;
+            }
+
+            public List<object> GetCanvas()
+            {
+                return canvas;
+            }
+
+            public void setMemento(Memento memento)
+            {
+                canvas = memento.getCanvas();
+            }
+
+             public Memento CreateMemento()
+            {
+            return new Memento(canvas);
+            }
+
+
         }
 
-        public Memento save()
-        {
-            return new Memento(this.canvas);
-        }
 
-    }
 
+      
         class Caretaker
         {
             private List<Memento> Mementos = new List<Memento>();
@@ -349,40 +359,26 @@
             }
 
 
-        private Originator originator = null;
-        public Caretaker(Originator originator)
-        {
-            this.originator = originator;
-        }
-
-            public void Backup()
-        {
-            Console.WriteLine("\nCaretaker: Saving Originator's state...");
-            this.Mementos.Add(this.originator.save());
-        }
-
 
             public void undo()
             {
-                MementosHistory.Add(Mementos[Mementos.Count - 1]);
-                Mementos.RemoveAt(Mementos.Count - 1);
-                Mementos.ForEach(Console.WriteLine);
+                int n = Mementos.Count - 1;
+                Console.WriteLine(n);
+                MementosHistory.Add(Mementos[n]);
+                Mementos.RemoveAt(n);
             }
 
             public void redo()
             {
-                MementosHistory.Add(Mementos[Mementos.Count - 1]);
-                Mementos.RemoveAt(Mementos.Count - 1);
-                Mementos.ForEach(Console.WriteLine);
+                int n = MementosHistory.Count - 1;
+                Mementos.Add(MementosHistory[n]);
+                MementosHistory.RemoveAt(n);
             }
 
-             public List<object> getMomento()
-              {
-                Mementos[Mementos.Count - 1].getCanvas().ForEach(Console.WriteLine);
-                return Mementos[Mementos.Count - 1].getCanvas();
-              }
-
-
-
+            public Memento getMemento()
+            {
+                Console.WriteLine(Mementos.Count);
+                return Mementos[Mementos.Count - 1];
+            }
         }
-    }
+}
