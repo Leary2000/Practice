@@ -1,420 +1,202 @@
 ﻿using System;
-using System.Collections.Generic;
 
-
-namespace MyCommand
+class Factory
 {
 
-    class Program
-    {
-        // The Canvas (Receiver) class - holds a list of shapes (model)
-        // Note - creating this class to hid how it is implemented and provide 
-        //        add and remove methods (which are just push and pop operations)
-        public class Canvas
+    public  class Memento
         {
+            private List<object> canvas = new List<object>();
 
-            
-            // Use a stack here only because we are working with Stack<T> classes
-            // I tend to prefer List<T> classes and I have control over manipulating
-            // the data structure - however, the stack data structure works fine here
-            private Stack<Shape> canvas = new Stack<Shape>();
-
-
-            public void Add(Shape s)
+            public Memento(List<object> canvas)
             {
-                canvas.Push(s);
-                Console.WriteLine("Added Shape to canvas: {0}" + Environment.NewLine, s);
-            }
-            public Shape Remove()
-            {
-                Shape s = canvas.Pop();
-                Console.WriteLine("Removed Shape from canvas: {0}" + Environment.NewLine, s);
-                return s;
+                this.canvas = canvas;
             }
 
-            public Canvas()
+            public List<object> getCanvas()
             {
-                Console.WriteLine("\nCreated a new Canvas!"); Console.WriteLine();
+                return canvas;
             }
 
-            public override string ToString()
+        }
+
+        public class Originator
+        {
+            public List<object> canvas;
+
+            public void SetCanvas(List<object> canvas)
             {
-                String str = "";
+                this.canvas = new List<object>(canvas);
+            }
+
+            public List<object> GetCanvas()
+            {
+                return canvas;
+            }
+
+            public void setMemento(Memento memento)
+            {
+                canvas = memento.getCanvas();
+            }
+
+             public Memento CreateMemento()
+            {
+            return new Memento(canvas);
+            }
+        }
+
+
+
+      
+        class Caretaker
+        {
+            private List<Memento> Mementos = new List<Memento>();
+            private List<Memento> MementosHistory = new List<Memento>();
+
+            public void add(Memento CurrentMemento)
+            {
+            Mementos.Add(CurrentMemento);
+            }
+            public void ClearRedo()
+            {
+                MementosHistory.Clear();
+            }
+
+            public void undo()
+            {
+                int n = Mementos.Count - 1;
                
-                for(int i = 0; i < canvas.Count; i++)
-                {
-                    //stops a new line being added if last shape in canvas
-                    if( i == canvas.Count - 1)
-                    str = str + canvas.ElementAt(i);
-                    
-                    else
-                    str = str + canvas.ElementAt(i) + Environment.NewLine;
-                }
-                return str;
+                MementosHistory.Add(Mementos[n]);
+                Mementos.RemoveAt(n);
+               
             }
 
-        }
-
-        // Abstract Shape class 
-        public abstract class Shape
-        {
-            public override string ToString()
+            public void redo()
             {
-                return "Shape!";
+                int n = MementosHistory.Count - 1;
+                Mementos.Add(MementosHistory[n]);
+                MementosHistory.RemoveAt(n);
+                
+            }
+
+            public Memento getMemento()
+            {
+                return Mementos[Mementos.Count - 1];
             }
         }
-
-        // Circle Shape class
-        public class Circle : Shape
-        {
-
-            public int X { get; private set; }
-            public int Y { get; private set; }
-            public int R { get; private set; }
-
-            public Circle(int x, int y, int r)
-            {
-                X = x; Y = y; R = r;
-            }
-
-            public override string ToString()
-            {
-                return "<circle cx =" + "\"" + this.X + "\"" + " cy=" + "\"" + this.Y + "\"" + " r=" + "\"" + this.R + " >";
-            }
-        }
-
-         public class Square : Shape
-        {
-           
-
-            public int X { get; private set; }
-            public int Y { get; private set; }
-            public int H { get; private set; }
-            public int W { get; private set; }
-
-
-            public Square(int x, int y, int h, int w)
-            {
-                X = x; Y = y; H = h; W = w;
-            }
 
             
-            public override string ToString()
-            {
-                return "<square cx =" + "\"" + this.X + "\"" + " cy=" + "\"" + this.Y + "\"" + " width=" + "\"" + this.W +  "\"" +" height=" + "\"" + this.H +"\"" + " >";
-                
-            }
-        }
+    // Factory Method Design Pattern
+     abstract class ShapeFactory
+    {
+    public abstract Shape CreateShape();
+    }
 
-         public class Ellipse : Shape
+    // Concrete Factory classes
+     class CircleFactory : ShapeFactory
+    {
+        public override Shape CreateShape()
         {
-
-            public int X { get; private set; }
-            public int Y { get; private set; }
-            public int RX { get; private set; }
-            public int RY { get; private set; }
-
-
-            public Ellipse(int x, int y, int rx, int ry)
-            {
-                X = x; Y = y; RX = rx; RY = ry;
-            }
-
-            public override string ToString()
-            {
-                return "<ellipse cx =" + "\"" + this.X + "\"" + " cy=" + "\"" + this.Y + "\"" + " rx=" + "\"" + this.RX +  "\"" +" ry=" + "\"" + this.RY +"\"" + " >";
-                
-            }
+            return new Circle();
         }
+    }
 
-         public class Line : Shape
+    class SquareFactory : ShapeFactory
+    {
+        public override Shape CreateShape()
         {
-
-            public int X1 { get; private set; }
-            public int Y1 { get; private set; }
-            public int X2 { get; private set; }
-            public int Y2 { get; private set; }
-
-
-            public Line(int x1, int y1, int x2, int y2)
-            {
-                X1 = x1; Y1 = y1; X2 = x2; Y2 = y2;
-            }
-
-            public override string ToString()
-            {
-                return "<line x1 =" + "\"" + this.X1 + "\"" + " y1=" + "\"" + this.Y1 + "\"" + " x2=" + "\"" + this.X2 +  "\"" +" Y2=" + "\"" + this.Y2 +"\"" + " >";
-                
-            }
+            return new Square();
         }
+    }
 
-         public class PolyLine : Shape
+     class EllipseFactory : ShapeFactory
+    {
+        public override Shape CreateShape()
         {
-
-            public int X { get; private set; }
-            public int Y { get; private set; }
-            public string POINTS { get; private set; }
-
-
-            public PolyLine(int x, string points, int y)
-            {
-                X = x; POINTS = points; Y = y;;
-            }
-
-            public override string ToString()
-            {
-                return "<polyline points=\"" + this.X + "," + this.POINTS +" ," + this.Y + " >";
-                
-            }
+            return new Ellipse();
         }
+    }
 
-        public class Polygon : Shape
+
+    // Abstract Product class
+    abstract class Shape
+    {
+        Random r = new Random();
+        public abstract void Draw();
+    }
+
+    // Concrete Product classes
+    class Circle : Shape
+    {
+                    Random r = new Random();
+        public override void Draw()
         {
-
-            public int X { get; private set; }
-            public int Y { get; private set; }
-            public string POINTS { get; private set; }
-
-
-            public Polygon(int x, string points, int y)
-            {
-                X = x; POINTS = points; Y = y;;
-            }
-
-            public override string ToString()
-            {
-                return "<polyline points=\"" + this.X + "," + this.POINTS +" ," + this.Y + " >";
-                
-            }
-        }
-
-         public class Path : Shape
-        {
-
-          
-            public string POINTS { get; private set; }
-
-
-            public Path(string points)
-            {
-                POINTS = points;
-            }
-
-            public override string ToString()
-            {
-                return "<path points=\"" + this.POINTS + " >";
-                
-            }
-        }
-
-        // The User (Invoker) Class
-        public class User
-        {
-            private Stack<Command> undo;
-            private Stack<Command> redo;
-
-            public int UndoCount { get => undo.Count; }
-            public int RedoCount { get => redo.Count; }
-            public User()
-            {
-                Reset();
-                Console.WriteLine("Created a new User!");
-            }
-            public void Reset()
-            {
-                undo = new Stack<Command>();
-                redo = new Stack<Command>();
-            }
-
-            public void Action(Command command)
-            {
-                // first update the undo - redo stacks
-                undo.Push(command);  // save the command to the undo command
-                redo.Clear();        // once a new command is issued, the redo stack clears
-
-                // next determine  action from the Command object type
-                // this is going to be AddShapeCommand or DeleteShapeCommand
-                Type t = command.GetType();
-                if (t.Equals(typeof(AddShapeCommand)))
-                {
-                    Console.WriteLine("Command Received: Add new Shape!" + Environment.NewLine);
-                    command.Do();
-                }
-                if (t.Equals(typeof(DeleteShapeCommand)))
-                {
-                    Console.WriteLine("Command Received: Delete last Shape!" + Environment.NewLine);
-                    command.Do();
-                }
-            }
-
-            // Undo
-            public void Undo()
-            {
-                Console.WriteLine("Undoing operation!"); Console.WriteLine();
-                if (undo.Count > 0)
-                {
-                    Command c = undo.Pop(); c.Undo(); redo.Push(c);
-                }
-            }
-
-            // Redo
-            public void Redo()
-            {
-                Console.WriteLine("Redoing operation!"); Console.WriteLine();
-                if (redo.Count > 0)
-                {
-                    Command c = redo.Pop(); c.Do(); undo.Push(c);
-                }
-            }
+            Console.WriteLine( "<circle cx =" + "\"" + r.Next(10,100) + "\"" + " cy=" + "\"" + r.Next(10,100) + "\"" + " r=" + "\"" + r.Next(10,100)+ "\"" + "/>");
 
         }
+    }
 
-
-        // Abstract Command (Command) class - commands can do something and also undo
-        public abstract class Command
+    class Ellipse : Shape
+    {
+        public override void Draw()
         {
-            public abstract void Do();     // what happens when we execute (do)
-            public abstract void Undo();   // what happens when we unexecute (undo)
+            Random r = new Random();
+            Console.WriteLine( "<ellipse cx =" + "\"" + r.Next(10,100) + "\"" + " cy=" + "\"" + r.Next(10,100) + "\"" + " rx=" + "\"" + r.Next(10,100) +   "\"" + " ry=" +  "\"" + r.Next(10,100)+  "\"" + "/>");
         }
+    }
 
-
-        // Add Shape Command - it is a ConcreteCommand Class (extends Command)
-        // This adds a Shape (Circle) to the Canvas as the "Do" action
-        public class AddShapeCommand : Command
+    class Square : Shape
+    {
+        public override void Draw()
         {
-            Shape shape;
-            Canvas canvas;
-
-            public AddShapeCommand(Shape s, Canvas c)
-            {
-                shape = s;
-                canvas = c;
-            }
-
-            // Adds a shape to the canvas as "Do" action
-            public override void Do()
-            {
-                canvas.Add(shape);
-            }
-            // Removes a shape from the canvas as "Undo" action
-            public override void Undo()
-            {
-                shape = canvas.Remove();
-            }
+            Random r = new Random();
+            Console.WriteLine("Drawing Square with style: " );
+                                string svg = "<rect x =" +  "\"" +r.Next(10,100)+ "\"" + " y=" + "\"" + r.Next(10,100) + "\"" + " width=" + "\"" + r.Next(10,100) + "\"" +" height=" + "\"" + r.Next(10,100) +"\"" + " />";
 
         }
+    }
 
-        // Delete Shape Command - it is a ConcreteCommand Class (extends Command)
-        // This deletes a Shape (Circle) from the Canvas as the "Do" action
-        public class DeleteShapeCommand : Command
+  
+static void addShape(string shape,List<object> canvas)
         {
-
-            Shape shape;
-            Canvas canvas;
-
-            public DeleteShapeCommand(Canvas c)
-            {
-                canvas = c;
-            }
-
-            // Removes a shape from the canvas as "Do" action
-            public override void Do()
-            {
-                shape = canvas.Remove();
-            }
-
-            // Restores a shape to the canvas as an "Undo" action
-            public override void Undo()
-            {
-                canvas.Add(shape);
-            }
-        }
-
-
-        static void createFile(Canvas canvas)
-        {
-            //Creates file in local folder called Canvas.svg
-            String path = @"Canvas.svg";
-            Console.WriteLine("Creating " + path + " file.");
-
-            //Will delete the file if it already exists
-            if(File.Exists(path))
-            File.Delete(path);
-
-             using (StreamWriter fs = File.CreateText(path))    
-                {  
-                    //Adds svg tags to start and end of file
-                    fs.WriteLine("<svg viewBox= \"0 0 300 100\" xmlns= \"http://www.w3.org/2000/svg\" >");
-
-                    //Get canvas shapes and add to file
-                    fs.WriteLine(canvas.ToString());
-
-                    fs.WriteLine("</svg>");
-                }
-        }
-
-         static void addShape(string shape,Canvas canvas, User user)
-        {
-            Random rnd = new Random();
-
-            //Used for shapes that have a path element
-            string RandomPath = "";
-
-            for(int i = 0; i < rnd.Next(1,6); i++)
-            {
-                RandomPath = RandomPath + (rnd.Next(10,100) + " " + rnd.Next(10,100) + ",");
-            }
-
+            CircleFactory circleFactory = new CircleFactory();
             switch(shape.ToLower())
             {
                 case "circle":
-                user.Action(new AddShapeCommand(new Circle(rnd.Next(1, 500), rnd.Next(1, 500), rnd.Next(1, 500)), canvas));
+                var circle = CircleFactory.CreateShape();
                 break;
 
+
                 case "square":
-                user.Action(new AddShapeCommand(new Square(rnd.Next(1, 500), rnd.Next(1, 500), rnd.Next(1, 500), rnd.Next(1, 500)), canvas));
+                Square mySquare = new Square();
                 break;
 
                 case "ellipse":
-                user.Action(new AddShapeCommand(new Ellipse(rnd.Next(1, 500), rnd.Next(1, 500), rnd.Next(1, 500), rnd.Next(1, 500)), canvas));
+                Ellipse myEllipse = new Ellipse();
                 break;
 
-                case "line":
-                user.Action(new AddShapeCommand(new Line(rnd.Next(1, 500), rnd.Next(1, 500), rnd.Next(1, 500), rnd.Next(1, 500)), canvas));
-                break;
-
-                case "polyline":
-                user.Action(new AddShapeCommand(new PolyLine(rnd.Next(1, 500), RandomPath, rnd.Next(1, 500)), canvas));
-                break;                
-
-                case "polygon":
-                user.Action(new AddShapeCommand(new Polygon(rnd.Next(1, 500), RandomPath, rnd.Next(1, 500)), canvas));
-                break;
-
-                case "path":
-                user.Action(new AddShapeCommand(new Path(RandomPath), canvas));
-                break;
             }
+
+            Console.WriteLine(shape.ToLower() + " added to canvas");
         }
 
-        //
-        // Entry point into application
-        //
+
+    class Program
+    {
         static void Main()
         {
             Console.Clear();
+
+            //will exit loop and quit program when set to true
             bool exit = false;
-            // Create a Canvas which will hold the list of shapes drawn on canvas
-            Canvas canvas = new Canvas();
 
-            // Create user and allow user actions (add and delete) shapes to a canvas
-            User user = new User();
+            List<object> canvas = new List<object>();
+            Originator originator = new Originator();
+            Caretaker caretaker = new Caretaker();
 
-            //user.Action(new DeleteShapeCommand(canvas));
-            
-            //While loop until users enters Q
-            Console.WriteLine("Enter H to see commands");
-               while(exit == false)
+            canvas.Add("<svg viewBox= \"0 0 300 100\" xmlns= \"http://www.w3.org/2000/svg\" >");
+            Console.WriteLine("Canvas created - use commands to add shapes to the canvas	");
+
+            while(exit == false)
             {
 
             String[] choice = Console.ReadLine().Split(' ');
@@ -430,27 +212,66 @@ namespace MyCommand
             Console.WriteLine("       -D    Display canvas");
             Console.WriteLine("       -C    Clear canvas");
             Console.WriteLine("       -Q    Quit ");
+
             break;
 
             case "A":
-            addShape(choice[1],canvas,user);
+            addShape(choice[1],canvas);
+            //save current canvas
+
+            originator.SetCanvas(canvas);
+            //add memento of current canvas to the caretaker
+            caretaker.add(originator.CreateMemento());
+
+            //clear redo list when a new shape has been added
+            caretaker.ClearRedo();
             break;
 
             case "U":
-            user.Undo();
+            try
+            {
+            caretaker.undo();
+            canvas = caretaker.getMemento().getCanvas();
+            }
+            catch(Exception err)
+            {
+                //if Undo list is empty
+                Console.WriteLine("Cannot Undo");
+            }
             break;
 
             case "R":
-            user.Redo();
+            try{
+
+            caretaker.redo();
+            canvas = caretaker.getMemento().getCanvas();
+            }
+             catch(Exception err)
+            {
+               //if Redo list is empty
+                Console.WriteLine("Cannot Redo");
+            }
+            break;
+
+            case "C":
+            canvas.Clear();
+            //add svg line to cleared canvas
+            canvas.Add("<svg viewBox= \"0 0 300 100\" xmlns= \"http://www.w3.org/2000/svg\" >");
+            //save current canvas
+            originator.SetCanvas(canvas);
+            caretaker.add(originator.CreateMemento());
             break;
 
             case "D":
-            Console.WriteLine(canvas.ToString());
+            canvas.ForEach(Console.WriteLine);
+            Console.WriteLine("</svg>");
             break;
 
             case "Q":
-            Console.WriteLine("Goodbye!");    
-            createFile(canvas);
+            Console.WriteLine("Goodbye!");
+            canvas = caretaker.getMemento().getCanvas();
+            canvas.Add("</svg>");
+            canvas.ForEach(Console.WriteLine);
             exit = true;
             break;
 
@@ -458,8 +279,11 @@ namespace MyCommand
            
         }
 
+            //end
+            //creates a file containing the final state of canvas
+           createFile(canvas);
+
+           
         }
     }
-
-
-}
+    }
